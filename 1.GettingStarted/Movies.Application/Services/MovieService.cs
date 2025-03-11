@@ -9,11 +9,13 @@ public class MovieService : IMovieService
 {
     private readonly IMovieRepository _repository;
     private readonly IValidator<Movie> _validator;
+    private readonly IRatingRepository _ratingRepository;
 
-    public MovieService(IMovieRepository repository, IValidator<Movie> validator)
+    public MovieService(IMovieRepository repository, IValidator<Movie> validator, IRatingRepository ratingRepository)
     {
         _repository = repository;
         _validator = validator;
+        _ratingRepository = ratingRepository;
     }
     public async Task<bool> CreateAsync(Movie movie, CancellationToken cToken)
     {
@@ -38,7 +40,17 @@ public class MovieService : IMovieService
         var movieExists = await _repository.ExistsByIdAsync(movie.Id, cToken);
         if (!movieExists) return null;
 
-        await _repository.UpdateAsync(movie, userId, cToken);
+        await _repository.UpdateAsync(movie, cToken);
+        if (!userId.HasValue)
+        {
+            var rating = await _ratingRepository.GetRatingAsync(movie.Id, cToken);
+            movie.Rating = rating;
+            return movie;
+        }
+
+        var (Rating, UserRating) = await _ratingRepository.GetRatingAsync(movie.Id, userId.Value, cToken);
+        movie.Rating = Rating;
+        movie.UserRating = UserRating;
         return movie;
     }
     public async Task<bool> DeleteAsync(Guid id, CancellationToken cToken)

@@ -40,15 +40,19 @@ public class MovieRepository : IMovieRepository
         return result > 0;
     }
 
-    public async Task<Movie?> GetByIdAsync(Guid id, Guid? userId = default, CancellationToken cToken)
+    public async Task<Movie?> GetByIdAsync(Guid id, Guid? userId = default, CancellationToken cToken = default)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync(cToken);
         var movie = await connection.QueryFirstOrDefaultAsync<Movie>(
             new CommandDefinition("""
-            SELECT *
-            FROM movies
-            WHERE id = @id;
-            """, new { id }, cancellationToken: cToken));
+            SELECT m.*, ROUND(AVG(r.rating), 1) AS rating, myr.rating AS userrating
+            FROM movies m
+            LEFT JOIN ratings r ON m.id = r.movieId
+            LEFT JOIN ratings myr ON m.id = myr.movieId 
+                AND myr.userId = @userId
+            WHERE id = @id
+            GROUP BY id, userrating;
+            """, new { id, userId }, cancellationToken: cToken));
         if (movie is null) return null;
 
         var genres = await connection.QueryAsync<string>(
@@ -62,15 +66,19 @@ public class MovieRepository : IMovieRepository
         return movie;
     }
 
-    public async Task<Movie?> GetBySlugAsync(string slug, Guid? userId = default, CancellationToken cToken)
+    public async Task<Movie?> GetBySlugAsync(string slug, Guid? userId = default, CancellationToken cToken = default)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync(cToken);
         var movie = await connection.QueryFirstOrDefaultAsync<Movie>(
             new CommandDefinition("""
-            SELECT *
-            FROM movies
-            WHERE slug = @slug;
-            """, new { slug }, cancellationToken: cToken));
+            SELECT m.*, ROUND(AVG(r.rating), 1) AS rating, myr.rating AS userrating
+            FROM movies m
+            LEFT JOIN ratings r ON m.id = r.movieId
+            LEFT JOIN ratings myr ON m.id = myr.movieId 
+                AND myr.userId = @userId
+            WHERE slug = @slug
+            GROUP BY id, userrating;
+            """, new { slug, userId }, cancellationToken: cToken));
         if (movie is null) return null;
 
         var genres = await connection.QueryAsync<string>(
@@ -84,25 +92,35 @@ public class MovieRepository : IMovieRepository
         return movie;
     }
 
-    public async Task<IEnumerable<Movie>> GetAllAsync(Guid? userId = default, CancellationToken cToken)
+    public async Task<IEnumerable<Movie>> GetAllAsync(Guid? userId = default, CancellationToken cToken = default)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync(cToken);
         var result = await connection.QueryAsync(new CommandDefinition("""
-            SELECT m.*, STRING_AGG(g.name, ',') AS genres
-            FROM movies m LEFT JOIN genres g ON m.id = g.movieId
+            SELECT 
+                m.*, 
+                STRING_AGG(DISTINCT g.name, ',') AS genres,
+                ROUND(AVG(r.rating), 1) AS rating, 
+                myr.rating AS userrating
+            FROM movies m 
+            LEFT JOIN genres g ON m.id = g.movieId
+            LEFT JOIN ratings r ON m.id = r.movieId
+            LEFT JOIN ratings myr ON m.id = myr.movieId 
+                AND myr.userId = @userId
             GROUP BY m.id;
-            """, cancellationToken: cToken));
+            """, new { userId } ,cancellationToken: cToken));
 
         return result.Select(x => new Movie 
         {
             Id = x.id,
             Title = x.title,
             YearOfRelease = x.yearofrelease,
+            Rating = (float?)x.rating,
+            UserRating = (int?)x.userrating,
             Genres = Enumerable.ToList(x.genres.Split(','))
         });
     }
 
-    public async Task<bool> UpdateAsync(Movie movie, Guid? userId = default, CancellationToken cToken)
+    public async Task<bool> UpdateAsync(Movie movie, CancellationToken cToken = default)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync(cToken);
         using var transaction = connection.BeginTransaction();

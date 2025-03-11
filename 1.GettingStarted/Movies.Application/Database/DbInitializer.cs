@@ -40,7 +40,7 @@ public class DbInitializer
             CREATE TABLE IF NOT EXISTS ratings (
                 userId UUID,
                 movieId UUID REFERENCES movies (id),
-                rating INTEGER NOT NULL
+                rating INTEGER NOT NULL,
                 PRIMARY KEY (userId, movieId)
             );
         """);
