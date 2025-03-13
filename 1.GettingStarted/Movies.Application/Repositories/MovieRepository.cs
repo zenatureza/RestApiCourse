@@ -106,7 +106,7 @@ public class MovieRepository : IMovieRepository
             LEFT JOIN ratings r ON m.id = r.movieId
             LEFT JOIN ratings myr ON m.id = myr.movieId 
                 AND myr.userId = @userId
-            GROUP BY m.id;
+            GROUP BY m.id, myr.rating;
             """, new { userId } ,cancellationToken: cToken));
 
         return result.Select(x => new Movie 

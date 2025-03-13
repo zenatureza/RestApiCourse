@@ -19,7 +19,7 @@ public class RatingRepository : IRatingRepository
             SELECT 
                 ROUND(AVG(r.rating), 1)
             FROM ratings r
-            WHERE r.movie_id = @movieId
+            WHERE r.movieId = @movieId
             """, new { movieId }, cancellationToken: cToken));
 
         return result;
@@ -33,9 +33,21 @@ public class RatingRepository : IRatingRepository
                 ROUND(AVG(r.rating), 1),
                 (SELECT rating FROM ratings WHERE movieId = @movieId AND userId = @userId LIMIT 1)
             FROM ratings r
-            WHERE r.movie_id = @movieId
+            WHERE r.movieId = @movieId
             """, new { movieId }, cancellationToken: cToken));
 
         return result;
+    }
+
+    public async Task<bool> RateMovieAsync(Guid movieId, int rating, Guid userId, CancellationToken cToken = default)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync(cToken);
+        var result = await connection.ExecuteAsync(new CommandDefinition("""
+            INSERT INTO ratings (movieId, userId, rating)
+            VALUES (@movieId, @userId, @rating)
+            ON CONFLICT (movieId, userId) DO UPDATE SET rating = @rating
+            """, new { movieId, userId, rating }, cancellationToken: cToken));
+
+        return result > 0;
     }
 }

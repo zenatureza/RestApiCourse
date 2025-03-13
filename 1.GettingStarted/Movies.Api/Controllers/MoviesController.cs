@@ -8,7 +8,6 @@ using Movies.Contracts.Requests;
 
 namespace Movies.Api.Controllers;
 
-//[Authorize]
 [ApiController]
 public class MoviesController : ControllerBase
 {

@@ -28,7 +28,9 @@ public static class ContractMapping
         Title = movie.Title,
         Slug = movie.Slug,
         YearOfRelease = movie.YearOfRelease,
-        Genres = movie.Genres
+        Genres = movie.Genres,
+        Rating = movie.Rating,
+        UserRating = movie.UserRating
     };
 
     public static MoviesResponse MapToResponse(this IEnumerable<Movie> movies) =>
