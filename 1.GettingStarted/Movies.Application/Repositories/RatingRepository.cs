@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Movies.Application.Database;
+using Movies.Application.Models;
 
 namespace Movies.Application.Repositories;
 
@@ -10,6 +11,18 @@ public class RatingRepository : IRatingRepository
     public RatingRepository(IDbConnectionFactory dbConnectionFactory)
     {
         _dbConnectionFactory = dbConnectionFactory;
+    }
+
+    public async Task<bool> DeleteRatingAsync(Guid movieId, Guid userId, CancellationToken cToken = default)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync(cToken);
+        var result = await connection.ExecuteAsync(new CommandDefinition("""
+            DELETE FROM ratings
+            WHERE movieId = @movieId 
+                AND userId = @userId
+            """, new { movieId, userId }, cancellationToken: cToken));
+
+        return result > 0;
     }
 
     public async Task<float?> GetRatingAsync(Guid movieId, CancellationToken cToken = default)
@@ -35,6 +48,19 @@ public class RatingRepository : IRatingRepository
             FROM ratings r
             WHERE r.movieId = @movieId
             """, new { movieId }, cancellationToken: cToken));
+
+        return result;
+    }
+
+    public async Task<IEnumerable<MovieRating>> GetRatingsForUserAsync(Guid userId, CancellationToken cToken = default)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync(cToken);
+        var result = await connection.QueryAsync<MovieRating>(new CommandDefinition("""
+            SELECT r.rating, r.movieId, m.slug
+            JOIN movies m ON m.id = r.movieId
+            FROM ratings r
+            WHERE userId = @userId
+            """, new { userId }, cancellationToken: cToken));
 
         return result;
     }

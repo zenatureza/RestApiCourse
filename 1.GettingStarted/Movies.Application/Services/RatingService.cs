@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using Movies.Application.Models;
 using Movies.Application.Repositories;
 
 namespace Movies.Application.Services;
@@ -13,6 +14,13 @@ public class RatingService : IRatingService
         _ratingRepository = ratingRepository;
         _movieRepository = movieRepository;
     }
+
+    public async Task<bool> DeleteRatingAsync(Guid movieId, Guid userId, CancellationToken cToken = default) => 
+        await _ratingRepository.DeleteRatingAsync(movieId, userId, cToken);
+
+    public async Task<IEnumerable<MovieRating>> GetRatingsForUserAsync(Guid userId, CancellationToken cToken = default) => 
+        await _ratingRepository.GetRatingsForUserAsync(userId, cToken);
+
     public async Task<bool> RateMovieAsync(Guid movieId, int rating, Guid userId, CancellationToken cToken = default)
     {
         if (rating is <= 0 or > 5) throw new ValidationException(
