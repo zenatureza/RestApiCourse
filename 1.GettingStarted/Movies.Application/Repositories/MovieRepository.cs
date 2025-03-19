@@ -187,4 +187,19 @@ public class MovieRepository : IMovieRepository
             new CommandDefinition("SELECT count(1) FROM movies WHERE id = @id", 
             new { id }, cancellationToken: cToken));
     }
+
+    public async Task<int> CountAsync(string? title, int? yearOfRelease, CancellationToken cToken = default)
+    {
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync(cToken);
+        
+        return await connection.QuerySingleAsync<int>(new CommandDefinition($"""
+            SELECT COUNT(id) FROM movies m
+            WHERE (@title IS NULL OR m.title LIKE ('%' || @title || '%'))
+                AND (@yearofrelease IS NULL OR m.yearofrelease = @yearofrelease)
+            """, new
+        {
+            title,
+            yearofrelease = yearOfRelease
+        }, cancellationToken: cToken));
+    }
 }
