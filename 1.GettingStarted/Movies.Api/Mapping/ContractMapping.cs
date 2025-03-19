@@ -52,7 +52,10 @@ public static class ContractMapping
     public static GetAllMoviesOption MapToOptions(this GetAllMoviesRequest request) => new()
     {
         YearOfRelease = request.YearOfRelease,
-        Title = request.Title
+        Title = request.Title,
+        SortField = request.SortBy?.Trim('-', '+').Trim(),
+        SortOrder = request.SortBy is null ? SortOrder.Unsorted : 
+            (request.SortBy.StartsWith('-') ? SortOrder.Descending : SortOrder.Ascending)
     };
 
     public static GetAllMoviesOption WithUserId(this GetAllMoviesOption options, Guid? userId) 

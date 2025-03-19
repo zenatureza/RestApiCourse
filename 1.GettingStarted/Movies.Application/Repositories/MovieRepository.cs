@@ -95,7 +95,16 @@ public class MovieRepository : IMovieRepository
     public async Task<IEnumerable<Movie>> GetAllAsync(GetAllMoviesOption options, CancellationToken cToken = default)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync(cToken);
-        var result = await connection.QueryAsync(new CommandDefinition("""
+        var orderClause = string.Empty;
+        if (options.SortField is not null)
+        {
+            orderClause = $"""
+                , m.{options.SortField}
+                order by m.{options.SortField} {(options.SortOrder == SortOrder.Descending ? "DESC" : "ASC")}
+                """;
+        }
+
+        var result = await connection.QueryAsync(new CommandDefinition($"""
             SELECT 
                 m.*, 
                 STRING_AGG(DISTINCT g.name, ',') AS genres,
@@ -108,7 +117,7 @@ public class MovieRepository : IMovieRepository
                 AND myr.userId = @userId
             WHERE (@title IS NULL OR m.title LIKE ('%' || @title || '%'))
                 AND (@yearofrelease IS NULL OR m.yearofrelease = @yearofrelease)
-            GROUP BY m.id, myr.rating;
+            GROUP BY m.id, myr.rating {orderClause}
             """, new 
             { 
                 userId = options.UserId,
