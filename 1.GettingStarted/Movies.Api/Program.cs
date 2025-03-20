@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Movies.Api.Auth;
+using Movies.Api.Health;
 using Movies.Api.Mapping;
 using Movies.Api.Swagger;
 using Movies.Application;
@@ -51,6 +52,8 @@ builder.Services.AddApiVersioning(options =>
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 builder.Services.AddControllers();
+builder.Services.AddHealthChecks()
+    .AddCheck<DatabaseHealthCheck>(DatabaseHealthCheck.Name);
 
 builder.Services.AddSwaggerGen();
 
@@ -71,6 +74,9 @@ if (app.Environment.IsDevelopment())
         }
     });
 }
+
+
+app.MapHealthChecks("_health");
 
 app.UseHttpsRedirection();
 
