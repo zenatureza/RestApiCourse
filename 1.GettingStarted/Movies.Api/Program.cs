@@ -49,6 +49,8 @@ builder.Services.AddApiVersioning(options =>
     options.ApiVersionReader = new MediaTypeApiVersionReader("api-version");
 }).AddMvc().AddApiExplorer();
 
+//builder.Services.AddResponseCaching();
+
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 builder.Services.AddControllers();
@@ -82,6 +84,9 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+//app.UseCors();
+//app.UseResponseCaching();
 
 app.UseMiddleware<ValidationMappingMiddleware>();
 app.MapControllers();
