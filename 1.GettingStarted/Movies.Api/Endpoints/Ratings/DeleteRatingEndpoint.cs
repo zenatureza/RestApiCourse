@@ -9,7 +9,7 @@ public static class DeleteRatingEndpoint
 
     public static IEndpointRouteBuilder MapDeleteRating(this IEndpointRouteBuilder app)
     {
-        app.MapPut(ApiEndpoints.Movies.DeleteRating, async (
+        app.MapDelete(ApiEndpoints.Movies.DeleteRating, async (
             Guid id,
             IRatingService ratingService,
             HttpContext context,

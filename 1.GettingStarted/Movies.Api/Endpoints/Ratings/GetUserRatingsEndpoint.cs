@@ -10,7 +10,7 @@ public static class GetUserRatingsEndpoint
 
     public static IEndpointRouteBuilder MapGetUserRatings(this IEndpointRouteBuilder app)
     {
-        app.MapPut(ApiEndpoints.Ratings.GetUserRatings, async (
+        app.MapGet(ApiEndpoints.Ratings.GetUserRatings, async (
             Guid id,
             IRatingService ratingService,
             HttpContext context,
