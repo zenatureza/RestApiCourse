@@ -29,7 +29,9 @@ public static class UpdateMovieEndpoint
             await outputCacheStore.EvictByTagAsync("movies", cToken);
             var response = movie.MapToResponse();
             return TypedResults.Ok(response);
-        }).WithName(Name);
+        })
+        .WithName(Name)
+        .RequireAuthorization(AuthConstants.TrustedMemberPolicyName);
 
         return app;
     }
