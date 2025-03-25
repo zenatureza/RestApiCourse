@@ -10,7 +10,7 @@ public static class DeleteMovieEndpoint
 
     public static IEndpointRouteBuilder MapDeleteMovie(this IEndpointRouteBuilder app)
     {
-        app.MapGet(ApiEndpoints.Movies.Delete, async (
+        app.MapDelete(ApiEndpoints.Movies.Delete, async (
             Guid id,
             IMovieService movieService,
             IOutputCacheStore outputCacheStore,

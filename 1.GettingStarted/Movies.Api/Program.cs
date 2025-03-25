@@ -51,7 +51,11 @@ builder.Services.AddApiVersioning(options =>
     options.AssumeDefaultVersionWhenUnspecified = true;
     options.DefaultApiVersion = new ApiVersion(1, 0);
     options.ApiVersionReader = new MediaTypeApiVersionReader("api-version");
-}).AddMvc().AddApiExplorer();
+})
+//.AddMvc()
+.AddApiExplorer();
+
+builder.Services.AddEndpointsApiExplorer();
 
 //builder.Services.AddResponseCaching();
 builder.Services.AddOutputCache(x =>

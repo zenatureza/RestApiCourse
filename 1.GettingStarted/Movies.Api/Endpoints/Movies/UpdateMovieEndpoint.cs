@@ -13,7 +13,7 @@ public static class UpdateMovieEndpoint
 
     public static IEndpointRouteBuilder MapUpdateMovie(this IEndpointRouteBuilder app)
     {
-        app.MapGet(ApiEndpoints.Movies.Update, async (
+        app.MapPut(ApiEndpoints.Movies.Update, async (
             Guid id,
             [FromBody] UpdateMovieRequest request,
             IMovieService movieService,

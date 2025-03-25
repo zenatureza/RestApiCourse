@@ -13,7 +13,7 @@ public static class CreateMovieEndpoint
 
     public static IEndpointRouteBuilder MapCreateMovie(this IEndpointRouteBuilder app)
     {
-        app.MapGet(ApiEndpoints.Movies.Create, async (
+        app.MapPost(ApiEndpoints.Movies.Create, async (
             [FromBody] CreateMovieRequest request,
             IMovieService movieService,
             IOutputCacheStore outputCacheStore,
