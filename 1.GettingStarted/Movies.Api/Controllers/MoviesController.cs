@@ -37,10 +37,10 @@ namespace Movies.Api.Controllers;
 //        await _outputCacheStore.EvictByTagAsync("movies", cToken);
 
 //        return CreatedAtAction(
-//            nameof(Get), new { idOrSlug = movie.Id }, 
+//            nameof(Get), new { idOrSlug = movie.Id },
 //            movie.MapToResponse());
 //    }
-    
+
 //    [HttpGet(ApiEndpoints.Movies.Get)]
 //    //[ResponseCache(Duration = 30, VaryByHeader = "Accept, Accept-Encoding", Location = ResponseCacheLocation.Any)]
 //    [OutputCache(PolicyName = "MovieCache")]
@@ -100,7 +100,7 @@ namespace Movies.Api.Controllers;
 //        var movies = await _movieService.GetAllAsync(options, cToken);
 //        return Ok(movies.MapToResponse(
 //            request.Page.GetValueOrDefault(PagedRequest.DefaultPage),
-//            request.PageSize.GetValueOrDefault(PagedRequest.DefaultPageSize), 
+//            request.PageSize.GetValueOrDefault(PagedRequest.DefaultPageSize),
 //            count));
 //    }
 

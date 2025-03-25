@@ -1,5 +1,6 @@
 ﻿using Movies.Api.Auth;
 using Movies.Application.Services;
+using Movies.Contracts.Responses;
 
 namespace Movies.Api.Endpoints.Ratings;
 
@@ -20,6 +21,8 @@ public static class DeleteRatingEndpoint
             return result ? Results.Ok() : Results.NotFound();
         })
         .WithName(Name)
+        .Produces(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
         .RequireAuthorization();
 
         return app;

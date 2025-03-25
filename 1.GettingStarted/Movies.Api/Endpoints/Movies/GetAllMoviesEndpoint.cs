@@ -2,10 +2,11 @@
 using Movies.Api.Mapping;
 using Movies.Application.Services;
 using Movies.Contracts.Requests.V1;
+using Movies.Contracts.Responses;
 
 namespace Movies.Api.Endpoints.Movies;
 
-public static class MapGetAllMoviesEndpoint
+public static class GetAllMoviesEndpoint
 {
     public const string Name = "GetMovies";
 
@@ -27,7 +28,10 @@ public static class MapGetAllMoviesEndpoint
                 request.Page.GetValueOrDefault(PagedRequest.DefaultPage), 
                 request.PageSize.GetValueOrDefault(PagedRequest.DefaultPageSize), 
                 count));
-        }).WithName(Name);
+        })
+        .WithName(Name)
+        .Produces<MoviesResponse>(StatusCodes.Status200OK)
+        .Produces<ValidationFailureResponse>(StatusCodes.Status400BadRequest);
 
         return app;
     }

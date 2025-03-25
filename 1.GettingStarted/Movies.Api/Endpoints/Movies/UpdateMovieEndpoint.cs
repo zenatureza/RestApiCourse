@@ -4,6 +4,7 @@ using Movies.Api.Auth;
 using Movies.Api.Mapping;
 using Movies.Application.Services;
 using Movies.Contracts.Requests.V1;
+using Movies.Contracts.Responses;
 
 namespace Movies.Api.Endpoints.Movies;
 
@@ -31,6 +32,9 @@ public static class UpdateMovieEndpoint
             return TypedResults.Ok(response);
         })
         .WithName(Name)
+        .Produces<MoviesResponse>(StatusCodes.Status200OK)
+        .Produces<ValidationFailureResponse>(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status404NotFound)
         .RequireAuthorization(AuthConstants.TrustedMemberPolicyName);
 
         return app;

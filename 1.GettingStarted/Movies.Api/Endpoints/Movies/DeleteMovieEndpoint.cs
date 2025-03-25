@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.OutputCaching;
 using Movies.Api.Auth;
 using Movies.Application.Services;
+using Movies.Contracts.Responses;
 
 namespace Movies.Api.Endpoints.Movies;
 
@@ -23,6 +24,8 @@ public static class DeleteMovieEndpoint
             return Results.NoContent();
         })
         .WithName(Name)
+        .Produces<MovieResponse>(StatusCodes.Status204NoContent)
+        .Produces(StatusCodes.Status404NotFound)
         .RequireAuthorization(AuthConstants.AdminUserPolicyName);
 
         return app;

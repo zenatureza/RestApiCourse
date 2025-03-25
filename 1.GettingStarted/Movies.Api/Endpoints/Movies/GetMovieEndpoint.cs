@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Routing;
-using Movies.Api.Auth;
+﻿using Movies.Api.Auth;
 using Movies.Api.Mapping;
 using Movies.Application.Services;
+using Movies.Contracts.Responses;
 
 namespace Movies.Api.Endpoints.Movies;
 
@@ -27,7 +27,10 @@ public static class GetMovieEndpoint
             var response = movie.MapToResponse();
             
             return TypedResults.Ok(response);
-        }).WithName(Name);
+        })
+        .WithName(Name)
+        .Produces<MovieResponse>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound);
 
         return app;
     }
